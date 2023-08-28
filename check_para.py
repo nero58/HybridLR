@@ -35,16 +35,17 @@ class Check_para():
                 sys.exit(f"Error: {e}")
         except Custom_exception as e:
                 sys.exit(f"Error: {e}") 
-    
-    
-    
-    
+
     def read_csv(self):
-        try:  
-            with open(self.data,'r') as csv_file:
-                content=csv.DictReader(csv_file)
-                self.df_=pd.DataFrame(content)
-            return self.df_
+        try:
+            if isinstance(self.data,pd.DataFrame):
+                 self.df_=self.data.copy()
+                 return self.df_
+            else:
+                 with open(self.data,'r') as csv_file:
+                     self.df_=csv.DictReader(csv_file)
+                    #  self.df_=pd.DataFrame(content)
+                 return self.df_
                 
         except FileNotFoundError as e:
             raise Custom_exception("File not found.")
@@ -65,9 +66,8 @@ class Check_para():
         ##### Check target #####
     def check_target(self):
             try:
-               #  sys.exit('1212')
-                if self.target in self.df_.columns:
-                     pass
+                if self.target =='':
+                     self.target=self.df_.iloc[:,-1].values
                 else:
                      raise Custom_exception('Check column name entered as target column.')
             except Custom_exception as e:
@@ -87,7 +87,7 @@ class Check_para():
                  ###### Optimization Function ######
     def check_OF(self):
             try:
-                 if self.opt_fun in ['GD','SGD','gd','sgd','',False]:
+                 if self.opt_fun in ['GD','SGD','gd','sgd',False]:
                       pass
                  else:  
                       raise Custom_exception('Check entered optimization Function')
@@ -96,27 +96,36 @@ class Check_para():
 
     def xy_change_type(self):
          for column in self.df_.columns:
-              if isinstance(column,object):
-                   self.df_.drop(column,axis=1,inplace=True)
-         x=self.df_.drop(self.target,axis=1)
-         y=self.df_[self.target]
+              if isinstance(column,(float,int)):
+                   pass
+              self.df_.drop(column,axis=1,inplace=True)
+         x = self.df_.iloc[:,:-1].values
+         y = self.target
 
-         self.x_=x.astype(float)
-         self.y_=y.astype(float)
-         
-
+         if isinstance(y,(float)):
+               self.x_=x.astype(float)
+               self.y_=y.copy()
+         elif isinstance(y,(int)):
+              self.x_=x.astype(int)
+              self.y_=y.copy()
+         else:
+               return self.x_,self.y_ 
+              
     
     def train_test_split(self):
-         print('hello')
          split_index=round(self.test_size*len(self.x_))
      #     random_split=[random.randint(0,split_index) for _ in range(split_index)]
-         self.x_train=self.x_.iloc[0:split_index,:]
-         self.x_test=self.x_.iloc[split_index+1:,:]
+         self.x_train=self.x_.iloc[:split_index]
+         self.x_test=self.x_.iloc[split_index:]
 
-         self.y_train=self.y_.iloc[split_index]
+         self.y_train=self.y_.iloc[:split_index]
          self.y_test=self.y_.iloc[split_index+1:]
-         return self.x_train,self.y_train,self.y_train,self.y_test 
+         return self.x_train,self.x_test,self.y_train,self.y_test 
 
 
     def return_para(self):
-         return [self.df_,self.test_size,self.target,self.opt_fun,self.score]
+         return self.df_,self.test_size,self.target,self.opt_fun,self.score
+    
+
+
+
