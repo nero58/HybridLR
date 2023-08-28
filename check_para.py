@@ -95,13 +95,15 @@ class Check_para():
                 sys.exit(f"Error: {e}")
 
     def xy_change_type(self):
-         for column in self.df_.columns:
-              if isinstance(column,(float,int)):
-                   pass
-              else:
-                    self.df_.drop(column,axis=1,inplace=True)
-                    self.x = self.df_.iloc[:,:-1].values
-                    self.y = self.target
+         numeric_columns = self.df_.select_dtypes(include=[float, int])
+     #     columns_to_drop=[]
+     #     for column in self.df_.columns:
+     #          if not isinstance(self.df_[column].dtype, (float, int)):
+     #                columns_to_drop.append(column)
+     #     self.df_.drop(columns=columns_to_drop,axis=1,inplace=True)   
+     #        
+         self.x = numeric_columns.iloc[:,:-1].values
+         self.y = self.target
 
      #     if isinstance(self.y,(float)):
      #           self.x_=self.x.astype(float)
@@ -114,13 +116,13 @@ class Check_para():
               
     
     def train_test_split(self):
-         split_index=round(self.test_size*len(self.x_))
+         split_index=round(self.test_size*len(self.x))
      #     random_split=[random.randint(0,split_index) for _ in range(split_index)]
-         self.x_train=self.x_.iloc[:split_index]
-         self.x_test=self.x_.iloc[split_index:]
+         self.x_train=self.x.iloc[:split_index]
+         self.x_test=self.x.iloc[split_index:]
 
-         self.y_train=self.y_.iloc[:split_index]
-         self.y_test=self.y_.iloc[split_index+1:]
+         self.y_train=self.y.iloc[:split_index]
+         self.y_test=self.y.iloc[split_index+1:]
          return self.x_train,self.x_test,self.y_train,self.y_test 
 
 
