@@ -98,18 +98,19 @@ class Check_para():
          for column in self.df_.columns:
               if isinstance(column,(float,int)):
                    pass
-              self.df_.drop(column,axis=1,inplace=True)
-         x = self.df_.iloc[:,:-1].values
-         y = self.target
+              else:
+                    self.df_.drop(column,axis=1,inplace=True)
+                    self.x = self.df_.iloc[:,:-1].values
+                    self.y = self.target
 
-         if isinstance(y,(float)):
-               self.x_=x.astype(float)
-               self.y_=y.copy()
-         elif isinstance(y,(int)):
-              self.x_=x.astype(int)
-              self.y_=y.copy()
-         else:
-               return self.x_,self.y_ 
+     #     if isinstance(self.y,(float)):
+     #           self.x_=self.x.astype(float)
+     #           self.y_=self.y.copy()
+     #     else:
+     #          self.x_=self.x.astype(int)
+     #          self.y_=self.y.copy()
+         
+         return self.x,self.y
               
     
     def train_test_split(self):
