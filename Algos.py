@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
   #### Linear Regression ####
-class LinearRegression:
+class Linear:
     def __init__(self):
         self.m = None
         self.b = None
